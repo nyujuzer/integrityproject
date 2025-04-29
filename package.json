@@ -16,12 +16,21 @@
   "dependencies": {
     "@google/genai": "^0.10.0",
     "@supabase/supabase-js": "^2.49.4",
-    "@vitejs/plugin-react": "^4.4.1",
     "cross-env": "^7.0.3",
     "express": "^5.1.0",
     "pg-promise": "^11.13.0",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3",
     "vite-express": "*"
+  },
+  "scripts": {
+    "dev:client": "vite",
+    "dev:server": "cd server && npm run dev",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "build:client": "tsc -b && vite build",
+    "build:server": "cd server && npm install && npm run build && cd ..",
+    "build": "npm run build:server && npm run build:client",
+    "lint": "eslint .",
+    "preview": "vite preview"
   }
 }

@@ -2,8 +2,12 @@ import express from "express";
 import ViteExpress from "vite-express";
 import createNewsArticle from "./news_genner";
 import { createClient } from "@supabase/supabase-js";
+const SUPABASE_KEY = process.env.SUPABASE_KEY
+const SUPABASE_URL = process.env.SUPABASE_URL
+console.log("SUPABASE_KEY", SUPABASE_KEY);
+console.log("SUPABASE_URL", SUPABASE_URL);
 const supabase = createClient(
-  process.env.SUPABASE_URL||"", process.env.SUPABASE_KEY||"");
+  SUPABASE_URL||"",SUPABASE_KEY ||"");
 const app = express();
 
 app.get("/create-articles", async (req, res) => {

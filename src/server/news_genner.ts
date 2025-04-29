@@ -43,10 +43,11 @@ interface transitionaryArticle {
 
 const GOOGLE_KEY = process.env.GOOGLE_KEY;
 const NEWS_KEY = process.env.NEWS_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const SUPABASE_URL = process.env.SUPABASE_URL;
 
 const supabase = createClient(
-    "https://hphpnxjfpnrmurjrbcef.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhwaHBueGpmcG5ybXVyanJiY2VmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU5NTM5NzYsImV4cCI6MjA2MTUyOTk3Nn0.9AaAHIKNcX3PHkKQKfoIEnqiehS-utxoPWSRfBl91R0"
+  SUPABASE_URL || "", SUPABASE_KEY || ""
   );
 const ai = new GoogleGenAI({ apiKey: GOOGLE_KEY });
 const generate_article = async (article: transitionaryArticle):Promise<any>=> {
