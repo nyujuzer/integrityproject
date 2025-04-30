@@ -29,14 +29,14 @@ app.get("/create-articles", async (req, res) => {
   }
 });
 app.get("/articles", async (req, res) => {
-  const { data, error } = await supabase
-    .from("satirical_news_article")
-    .select("*");
-    if (error || !data || data.length == 0) {
-      console.error("Error fetching articles:", error, "data:", data);
+  let { data: satirical_news_article, error } = await supabase
+  .from('satirical_news_article')
+  .select('*')
+    if (error || !satirical_news_article || satirical_news_article.length == 0) {
+      console.error("Error fetching articles:", error, "data:", satirical_news_article);
       res.status(500).send("Internal Server Error");
     }else{
-      res.send(data);
+      res.send(satirical_news_article);
     }
 });
 app.get("/articles/:id", async (req, res) => {
