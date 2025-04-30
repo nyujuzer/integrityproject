@@ -115,7 +115,7 @@ const getnews = async () => {
       `https://newsdata.io/api/1/latest?apikey=${NEWS_KEY}&language=en`
     );
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}, ${response.text}`);
     }
     const data = await response.json();
     if (Array.isArray(data.results)) {
