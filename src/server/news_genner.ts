@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
+import { response } from "express";
 enum tags {
   POLITICS,
   ECONOMY,
@@ -125,7 +126,7 @@ const getnews = async () => {
       article_extract.forEach(async (article: transitionaryArticle) => {
         const newsArticle = await generate_article(article);
         if (newsArticle.error) {
-          console.error("Error generating article:", newsArticle.error);
+          console.log("Error generating satire article:", newsArticle.error, newsArticle);
           return false
         }
         var success = await upload(JSON.parse(newsArticle));
