@@ -88,6 +88,7 @@ const generate_article = async (article: transitionaryArticle):Promise<any>=> {
       },
     });
     var jsonstream = JSON.parse(JSON.stringify(response.text))
+    console.log("generate_articles return", jsonstream)
     return jsonstream as NewsArticle;
 } catch (error) {
     console.error("Error generating article:", error);
@@ -95,15 +96,15 @@ const generate_article = async (article: transitionaryArticle):Promise<any>=> {
   }
 };
 const upload = async (article: NewsArticle) => {
-    // console.log("from here!!!!!!!!!!!!!!!!!!!!!!!!", article, "------------------")
+    console.log(article)
         const { data, error } = await supabase
           .from("satirical_news_article")
           .insert({title: article.title, body: article.content, tags: article.tags});
         if (error) {
-        //   console.log("uh-oh", error);
+          console.log("uh-oh", error);
           return false
         }else{
-        //   console.log("success", data);
+          console.log("success", data);
           return true
         }
 }
@@ -129,6 +130,7 @@ const getnews = async () => {
         }
         var success = await upload(JSON.parse(newsArticle));
         result = success
+        console.log("success", success, "on upload");
         return result
     });
     result = true

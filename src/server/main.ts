@@ -39,7 +39,7 @@ app.get("/articles", async (req, res) => {
       res.send(satirical_news_article);
     }
 });
-app.get("/articles/:id", async (req, res) => {
+app.get("/article/:id", async (req, res) => {
   const { data, error } = await supabase
     .from("satirical_news_article")
     .select("*").eq("id", req.params.id);
