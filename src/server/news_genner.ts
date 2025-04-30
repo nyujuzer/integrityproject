@@ -47,7 +47,7 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 
 const supabase = createClient(
-  SUPABASE_URL || "", SUPABASE_KEY || ""
+  SUPABASE_URL as string, SUPABASE_KEY as string
   );
 const ai = new GoogleGenAI({ apiKey: GOOGLE_KEY });
 const generate_article = async (article: transitionaryArticle):Promise<any>=> {

@@ -7,7 +7,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL
 console.log("SUPABASE_KEY", SUPABASE_KEY);
 console.log("SUPABASE_URL", SUPABASE_URL);
 const supabase = createClient(
-  SUPABASE_URL||"",SUPABASE_KEY ||"");
+  SUPABASE_URL as string,SUPABASE_KEY as string);
 const app = express();
 
 app.get("/create-articles", async (req, res) => {
