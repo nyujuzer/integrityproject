@@ -33,7 +33,7 @@ app.get("/articles", async (req, res) => {
     .from("satirical_news_article")
     .select("*");
     if (error || !data || data.length == 0) {
-      console.error("Error fetching articles:", error);
+      console.error("Error fetching articles:", error, "data:", data);
       res.status(500).send("Internal Server Error");
     }else{
       res.send(data);
@@ -44,7 +44,7 @@ app.get("/articles/:id", async (req, res) => {
     .from("satirical_news_article")
     .select("*").eq("id", req.params.id);
     if (error || !data || data.length == 0) {
-      console.error("Error fetching articles:", error);
+      console.error("Error fetching articles:", error, "data:", data);
       res.status(500).send("Internal Server Error");
     }else{
       res.send(data);
