@@ -12,7 +12,8 @@
       }
     ],
     "rewrites": [
-      { "source": "/api/:path*", "destination": "/server/api/main.ts" },
+
       { "source": "/(.*)", "destination": "/index.html" }
     ]
   }
+
