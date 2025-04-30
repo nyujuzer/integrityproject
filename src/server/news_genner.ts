@@ -93,7 +93,7 @@ const generate_article = async (article: transitionaryArticle):Promise<any>=> {
     return jsonstream as NewsArticle;
 } catch (error) {
     console.error("Error generating article:", error);
-    return {error:error, continue:false};
+    return {error:error, keep_going:false};
   }
 };
 const upload = async (article: NewsArticle) => {
