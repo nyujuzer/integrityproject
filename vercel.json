@@ -1,13 +1,19 @@
 {
-  "headers": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "max-age=31536000, immutable"
-        }
-      ]
+      "src": "src/server/api/main.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
     }
+  ],
+  "rewrites": [
+
+    { "source": "/(.*)", "destination": "/index.html" },
+    { "source": "/api/:path*", "destination": "/src/server/api/main.ts" }
   ]
 }
