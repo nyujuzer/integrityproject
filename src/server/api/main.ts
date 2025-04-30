@@ -29,6 +29,7 @@ app.get("/create-articles", async (req, res) => {
   }
 });
 app.get("/articles", async (req, res) => {
+  console.log("maybe this will show up?")
   const { data, error } = await supabase
     .from("satirical_news_article")
     .select("*");
