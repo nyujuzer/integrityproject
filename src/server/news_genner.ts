@@ -1,6 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
-import { response } from "express";
+import dotenv from "dotenv";
+dotenv.config()
+console.log(process.env.NEWS_KEY)
 enum tags {
   POLITICS,
   ECONOMY,
@@ -32,6 +34,12 @@ enum tags {
   SECRET_SOCIETIES,
   REAL_ESTATE,
 }
+type VerboseResult = {
+  success: boolean;
+  message: string;
+  error?: any;
+};
+
 type NewsArticle = {
   title: string;
   content: string;
@@ -41,6 +49,7 @@ interface transitionaryArticle {
   title: string;
   description: string;
 }
+dotenv.config()
 
 const GOOGLE_KEY = process.env.GOOGLE_KEY;
 const NEWS_KEY = process.env.NEWS_KEY;
@@ -51,6 +60,7 @@ const supabase = createClient(
   SUPABASE_URL as string, SUPABASE_KEY as string
   );
 const ai = new GoogleGenAI({ apiKey: GOOGLE_KEY });
+
 const generate_article = async (article: transitionaryArticle):Promise<any>=> {
   const prompt = `You are the world's greatest satirical writer — part savage roaster, part witty genius, and part ruthless truth-teller.
     You just encountered the following news articles: ${JSON.stringify(
@@ -107,45 +117,72 @@ const upload = async (article: NewsArticle) => {
           return true
         }
 }
-const getnews = async () => {
-    var result = false
+const getnews = async (): Promise<VerboseResult> => {
   try {
     const response = await fetch(
       `https://newsdata.io/api/1/latest?apikey=${NEWS_KEY}&language=en`
     );
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}, ${await response.text()}, ${NEWS_KEY}`);
+      const errorText = await response.text();
+      console.log(NEWS_KEY)
+      return {
+        success: false,
+        message: "We are having trouble reaching the news API.",
+        error: `Status: ${response.status}, Details: ${errorText}`,
+      };
     }
+
     const data = await response.json();
-    if (Array.isArray(data.results)) {
-      const article_extract = data.results.map((article: any) => {
-        return { title: article.title, description: article.description };
-      });
-      article_extract.forEach(async (article: transitionaryArticle) => {
-        const newsArticle = await generate_article(article);
-        if (newsArticle.error) {
-          console.log("Error generating satire article:", newsArticle.error, newsArticle);
-          return false
-        }
-        var success = await upload(JSON.parse(newsArticle));
-        result = success
-        console.log("success", success, "on upload");
-        return result
-    });
-    result = true
-    } else {
-      console.error("Unexpected data format:", data);
-      result = false
+
+    if (!Array.isArray(data.results)) {
+      return {
+        success: false,
+        message: "Received unexpected data format from news API.",
+        error: data,
+      };
     }
+
+    const article_extract = data.results.map((article: any) => ({
+      title: article.title,
+      description: article.description,
+    }));
+
+    for (const article of article_extract) {
+      const newsArticle = await generate_article(article);
+
+      if (newsArticle.error) {
+        return {
+          success: false,
+          message: "Error generating satirical article from news data.",
+          error: newsArticle.error,
+        };
+      }
+
+      const success = await upload(JSON.parse(JSON.stringify(newsArticle)));
+      if (!success) {
+        return {
+          success: false,
+          message: "Failed to upload satirical article to Supabase.",
+        };
+      }
+    }
+
+    return {
+      success: true,
+      message: "Successfully fetched, generated, and uploaded satirical news articles.",
+    };
   } catch (error) {
-    console.error("Error fetching news:", error);
-    result = false
+    return {
+      success: false,
+      message: "An unexpected error occurred while fetching the news.",
+      error,
+    };
   }
-  return result
 };
-const createNewsArticle = async () => {
-    const success =  await getnews();
-    return success
+
+const createNewsArticle = async (): Promise<VerboseResult> => {
+  return await getnews();
 };
 
 export default createNewsArticle;
