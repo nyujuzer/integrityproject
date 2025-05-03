@@ -1,7 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { createClient } from "@supabase/supabase-js";
+import supabase from "./supabase";
 import dotenv from "dotenv";
 dotenv.config()
+
 console.log(process.env.NEWS_KEY)
 enum tags {
   POLITICS,
@@ -49,16 +50,8 @@ interface transitionaryArticle {
   title: string;
   description: string;
 }
-dotenv.config()
-
-const GOOGLE_KEY = process.env.GOOGLE_KEY;
 const NEWS_KEY = process.env.NEWS_KEY;
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
-const SUPABASE_URL = process.env.SUPABASE_URL;
-
-const supabase = createClient(
-  SUPABASE_URL as string, SUPABASE_KEY as string
-  );
+const GOOGLE_KEY = process.env.GOOGLE_KEY;
 const ai = new GoogleGenAI({ apiKey: GOOGLE_KEY });
 
 const generate_article = async (article: transitionaryArticle):Promise<any>=> {
@@ -95,17 +88,15 @@ const generate_article = async (article: transitionaryArticle):Promise<any>=> {
         topK: 50,
         topP: 0.9,
       },
-    });
-    var jsonstream = JSON.parse(JSON.stringify(response.text))
-    console.log("generate_articles return", jsonstream)
-    return jsonstream as NewsArticle;
+    });if (response.text)
+    var jsonstream = JSON.parse(response.text)
+    return jsonstream;
 } catch (error) {
     console.error("Error generating article:", error);
     return {error:error, keep_going:false};
   }
 };
 const upload = async (article: NewsArticle) => {
-    console.log(article)
         const { data, error } = await supabase
           .from("satirical_news_article")
           .insert({title: article.title, body: article.content, tags: article.tags});
@@ -185,4 +176,4 @@ const createNewsArticle = async (): Promise<VerboseResult> => {
   return await getnews();
 };
 
-export default createNewsArticle;
+export {createNewsArticle, upload};
