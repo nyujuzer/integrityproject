@@ -19,7 +19,7 @@ app.post("/create-articles", async (req, res) => {
     console.log("data", data);
     if (data && data.length == 0) {
       console.error("Error fetching API key:", error);
-      res.status(401).send("Unauthorized, invalid API key");
+      res.status(401).send({error:"Unauthorized"});
     } else {
       const value = await createNewsArticle();
       console.log("value", value);
@@ -28,6 +28,10 @@ app.post("/create-articles", async (req, res) => {
   }
 });
 app.get("/articles", async (req, res) => {
+  if (req.query.tag){
+    res.redirect("/filter-articles?tag="+req.query.tag);
+    return
+  }
   let { data: satirical_news_article, error } = await supabase
     .from("satirical_news_article")
     .select("*");
@@ -38,7 +42,7 @@ app.get("/articles", async (req, res) => {
       "data:",
       satirical_news_article
     );
-    res.status(500).send("Internal Server Error");
+    res.status(500).send({error:"Internal Server Error"});
   } else {
     res.send(satirical_news_article);
   }
@@ -46,7 +50,7 @@ app.get("/articles", async (req, res) => {
 app.get("/article/:id", async (req, res) => {
   const id = req.params.id;
   if (!validate(id)) {
-    res.status(400).send("Invalid UUID format");
+    res.status(400).send({error:"Invalid UUID"});
     return;
   }
   const { data, error } = await supabase
@@ -55,9 +59,9 @@ app.get("/article/:id", async (req, res) => {
     .eq("id", id);
   if (error) {
     console.error("Error fetching articles:", error, "data:", data);
-    res.status(500).send("Internal Server Error");
+    res.status(500).send({error:"Internal Server Error"});
   } else if (!data || data.length == 0) {
-    res.status(404).send("Article not found");
+    res.status(404).send({error:"Article not found"});
   } else {
     res.send(data);
   }
@@ -77,11 +81,32 @@ app.post("/create-article", async (req, res) => {
       res.send(key_is_valid);
       return
     }
-    res.send("key doesn't exist");
-    return
   }
   res.send(key);
 });
+
+app.get("/filter-articles", async (req, res) => {
+console.log("filter-articles")
+  const tag = req.query.tag?.toString().toUpperCase() as string;
+  if (!tag) {
+    res.redirect("/articles");
+    return;
+  }
+  const tags = tag.split("+").map((tag) => tag.trim().toUpperCase());
+  const { data, error } = await supabase
+    .from("satirical_news_article")
+    .select("*")
+    .contains("tags", [tags]);
+  if (error) {
+    console.error("Error fetching articles:", error, "data:", data);
+    res.status(500).send({error:"Internal Server Error"});
+  } else if (!data || data.length == 0) {
+    res.status(404).send({error:"Article not found"});
+  } else {
+    res.send(data);
+  }
+
+})
 ViteExpress.listen(app, 3000, () =>
   console.log("Server is listening on port 3000...")
 );
