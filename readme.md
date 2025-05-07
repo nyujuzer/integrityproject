@@ -34,12 +34,13 @@ const get_specific_article = async (article_id)=>{
     return response.json()
 }
 ```
-- /create-articles?api_key=YOUR_API_KEY - runs the article creation process. Right now, there is only one API key available, as the project is still in development. I chose set this system up, to make sure only us can access the model. i wouldn't want a $3000 invoice from google,
+- /create-articles?api_key=YOUR_API_KEY - runs the article creation process. Right now, there is only one API key available, as the project is still in development. I chose set this system up, to make sure only us can access the model. i wouldn't want a $3000 invoice from google. \nThis will not be needed on the front-end
 
-This will not be needed on the front-end
+- /filter-articles?tags=tag1+tag2 - This will return the articles on which the specified tags are present.This way the user's can select if they wanna read news that are about both economy, and the state of yu-gi-oh for example
+
+This endpoint will return in the same format as /articles
 
 ## roadmap
 
-I wanna add a filtering option based on the tags.
 I will specify the tags, right now the AI makes the tags up on it's own, due to the google genai package's typing limitations.
 I plan to add ways to make news with a specific tag.
