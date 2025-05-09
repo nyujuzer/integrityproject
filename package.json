@@ -8,6 +8,7 @@
     "build": "vite build"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.2",
     "@types/uuid": "^10.0.0",
@@ -18,10 +19,12 @@
     "@google/genai": "^0.10.0",
     "@supabase/supabase-js": "^2.49.4",
     "@vitejs/plugin-react": "^4.4.1",
+    "cookie-parser": "^1.4.7",
     "cross-env": "^7.0.3",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "pg-promise": "^11.13.0",
+    "resend": "^4.5.1",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3",
     "vite-express": "*"
