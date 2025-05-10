@@ -2,54 +2,9 @@ import { GoogleGenAI, Modality, Type } from "@google/genai";
 import supabase from "./supabase";
 import dotenv from "dotenv";
 import fs from "fs";
+import { transitionaryArticle, tags, NewsArticle, VerboseResult } from "./types";
 dotenv.config()
-const tags = [
-  "POLITICS",
-  "ECONOMY",
-  "TECHNOLOGY",
-  "HEALTH",
-  "ENTERTAINMENT",
-  "SPORTS",
-  "ENVIRONMENT",
-  "INTERNATIONAL",
-  "CULTURE",
-  "OPINION",
-  "INVESTIGATIONS",
-  "BREAKING_NEWS",
-  "CONSPIRACIES",
-  "HUMAN_INTEREST",
-  "CELEBRITIES",
-  "SCIENCE",
-  "CRIME",
-  "MILITARY",
-  "FAITH",
-  "WEIRD_NEWS",
-  "UFO_SIGHTINGS",
-  "CORPORATE_SCANDALS",
-  "ARTIFICIAL_INTELLIGENCE",
-  "HISTORICAL_REVISIONISM",
-  "AGRICULTURE",
-  "EDUCATION",
-  "SOCIAL_MEDIA",
-  "SECRET_SOCIETIES",
-  "REAL_ESTATE",
-];
 
-type VerboseResult = {
-  success: boolean;
-  message: string;
-  error?: any;
-};
-
-type NewsArticle = {
-  title: string;
-  content: string;
-  tags: string[];
-};
-interface transitionaryArticle {
-  title: string;
-  description: string;
-}
 const NEWS_KEY = process.env.NEWS_KEY;
 const GOOGLE_KEY = process.env.GOOGLE_KEY;
 const model = "gemini-2.0-flash-exp-image-generation"
@@ -236,4 +191,4 @@ const generate_article_with_image = async ()=>{
   }
 }
 
-export {createNewsArticle, upload, generate_article_with_image};
+export {createNewsArticle, upload};

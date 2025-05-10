@@ -3,12 +3,21 @@ import ViteExpress from "vite-express";
 import { createNewsArticle, upload } from "./news_genner";
 import dotenv from "dotenv";
 import { validate } from "uuid";
-import { check_API_key, check_user_exists, validate_email } from "./utils";
+import {
+  check_API_key,
+  get_user_async,
+  check_user_exists,
+  validate_email,
+  get_articles,
+  rank_articles_based_on_tags,
+} from "./utils";
 import supabase from "./supabase";
 import cookieParser from "cookie-parser";
-import {Resend} from 'Resend'
+import { Resend } from "Resend";
+import { NewsArticle, user_tag } from "./types";
 dotenv.config();
-const resend = new Resend(process.env.RESEND_KEY)
+const resend = new Resend(process.env.RESEND_KEY);
+const nodemailer = require("nodemailer");
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -36,16 +45,9 @@ app.get("/articles", async (req, res) => {
     res.redirect("/filter-articles?tag=" + req.query.tag);
     return;
   }
-  let { data: satirical_news_article, error } = await supabase
-    .from("satirical_news_article")
-    .select("*");
-  if (error || !satirical_news_article || satirical_news_article.length == 0) {
-    console.error(
-      "Error fetching articles:",
-      error,
-      "data:",
-      satirical_news_article
-    );
+  const satirical_news_article = await get_articles();
+  if (!satirical_news_article) {
+    console.error("Error fetching articles:");
     res.status(500).send({ error: "Internal Server Error" });
   } else {
     res.send(satirical_news_article);
@@ -76,7 +78,7 @@ app.get("/article/:id", async (req, res) => {
         .select("tags")
         .eq("user", userId)
         .single();
-        console.log(user_data)
+      console.log(user_data);
       if (user_data && user_data.tags) {
         const updatedTags = { ...user_data.tags };
         data.tags.forEach((tag: string) => {
@@ -86,7 +88,7 @@ app.get("/article/:id", async (req, res) => {
             updatedTags[tag] = 1;
           }
         });
-        console.log(updatedTags, "________")
+        console.log(updatedTags, "________");
         const { data: tag_success, error: updateError } = await supabase
           .from("users")
           .update({ tags: updatedTags })
@@ -159,18 +161,25 @@ app.get("/filter-articles", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const {email, password, name} = req.body;
-  const {data: user_data, error: user_error} = await supabase.auth.signUp({email: email, password: password});
-  if (user_error){
+  const { email, password, name } = req.body;
+  const { data: user_data, error: user_error } = await supabase.auth.signUp({
+    email: email,
+    password: password,
+  });
+  if (user_error) {
     console.error("Error signing up:", user_error);
-    res.status(400).send({error: "the email is already registered"});
-    return
-  }else{
-    const {data:user, error: insert_error,} = await supabase.from("users").insert({user:user_data.user?.id}).select().single()
+    res.status(400).send({ error: "the email is already registered" });
+    return;
+  } else {
+    const { data: user, error: insert_error } = await supabase
+      .from("users")
+      .insert({ user: user_data.user?.id })
+      .select()
+      .single();
     if (insert_error) {
       console.error("Error inserting user:", insert_error);
-      res.status(500).send({error: "Error creating new User"});
-      return
+      res.status(500).send({ error: "Error creating new User" });
+      return;
     } else {
       // const test = await resend.emails.send({
       //   from:"test@test.com",
@@ -179,19 +188,59 @@ app.post("/register", async (req, res) => {
       //   html:"Hello world"
       // })
       // console.log(test.data, test.error)
-      res.cookie("id",user?.id, {expires:new Date(Date.now()+86000000)}).send({success: true, message: "User created successfully", user});
-        return
+      res
+        .cookie("id", user?.id, { expires: new Date(Date.now() + 86000000) })
+        .send({ success: true, message: "User created successfully", user });
+      return;
     }
   }
 });
-app.post("/login", async (req, res)=>{
-  const {email, password} = req.body
-  if (email && password){
-    const {data, error} = await supabase.auth.signInWithPassword({email:email, password:password})
-    console.log(data, error)
-    res.send("hello")
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  if (email && password) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+    console.log(data, error);
+    res.send("hello");
   }
-})
+});
+
+app.get("/recommended", async (req, res) => {
+  const id = req.cookies.id;
+  const user_data = await get_user_async(id);
+  if (!user_data) {
+    res.status(500).send({error:"We were unable to find a user with that ID"});
+    return;
+  }
+  const articles = await get_articles();
+  if (!articles) {
+    res.status(500).send({error:"We were unable to fetch articles"});
+    return;
+  }
+  const tags_raw = Object.keys(user_data.tags);
+  const values = Object.values(user_data.tags);
+  const tags = tags_raw.map((tag, index) => ({
+    tag: tag,
+    value: values[index],
+  }));
+  console.log(tags);
+
+  const recommendations = rank_articles_based_on_tags(
+    articles as Array<NewsArticle>,
+    tags as Array<user_tag>
+  );
+  console.log(recommendations);
+  recommendations.sort((article_1, article_2) => {
+    return article_2.rank-article_1.rank
+  });
+  recommendations.forEach((e)=>{
+    console.log(e.tags, e.rank)
+  })
+  res.send(recommendations);
+});
+
 ViteExpress.listen(app, 3000, () =>
   console.log("Server is listening on port 3000...")
 );

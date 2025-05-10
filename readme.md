@@ -39,9 +39,11 @@ This will not be needed on the front-end
 
 - /filter-articles?tags=tag1+tag2 - This will return the articles on which the specified tags are present.This way the user's can select if they wanna read news that are about both economy, and the state of yu-gi-oh for example
 
+- /register - This is a POST request, in which you pass in name, email, and password into the body.
+- /login - This endpoint is a POST request, however it's unavailable until further notice
+- /recommended - This GET request will return a list of articles, weighed by the tags the user has deliberately clicked on  
 This endpoint will return in the same format as /articles
 
 ## roadmap
 
-I will specify the tags, right now the AI makes the tags up on it's own, due to the google genai package's typing limitations.
 I plan to add ways to make news with a specific tag.
