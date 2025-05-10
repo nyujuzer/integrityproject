@@ -219,25 +219,24 @@ app.get("/recommended", async (req, res) => {
     res.status(500).send({error:"We were unable to fetch articles"});
     return;
   }
+  if (JSON.stringify(user_data.tags) === "{}"){
+    res.send(articles)
+    return
+  }
   const tags_raw = Object.keys(user_data.tags);
   const values = Object.values(user_data.tags);
   const tags = tags_raw.map((tag, index) => ({
     tag: tag,
     value: values[index],
   }));
-  console.log(tags);
 
   const recommendations = rank_articles_based_on_tags(
     articles as Array<NewsArticle>,
     tags as Array<user_tag>
   );
-  console.log(recommendations);
   recommendations.sort((article_1, article_2) => {
     return article_2.rank-article_1.rank
   });
-  recommendations.forEach((e)=>{
-    console.log(e.tags, e.rank)
-  })
   res.send(recommendations);
 });
 
