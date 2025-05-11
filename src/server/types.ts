@@ -41,6 +41,9 @@ interface NewsArticle {
   content: string;
   tags: string[];
 };
+interface news_article_trending extends NewsArticle{
+    views_last_24:number
+}
 interface transitionaryArticle {
   title: string;
   description: string;
@@ -53,5 +56,5 @@ interface user_tag {
     tag:string,
     value: number
 }
-export type {NewsArticle, ranked_article, user_tag, transitionaryArticle, VerboseResult}
+export type {NewsArticle, ranked_article, user_tag, transitionaryArticle, news_article_trending, VerboseResult}
 export {tags}

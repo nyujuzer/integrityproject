@@ -6,18 +6,13 @@ import { validate } from "uuid";
 import {
   check_API_key,
   get_user_async,
-  check_user_exists,
-  validate_email,
   get_articles,
   rank_articles_based_on_tags,
 } from "./utils";
 import supabase from "./supabase";
 import cookieParser from "cookie-parser";
-import { Resend } from "Resend";
-import { NewsArticle, user_tag } from "./types";
+import { news_article_trending, NewsArticle, user_tag } from "./types";
 dotenv.config();
-const resend = new Resend(process.env.RESEND_KEY);
-const nodemailer = require("nodemailer");
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -70,15 +65,16 @@ app.get("/article/:id", async (req, res) => {
   } else if (!data || data.length == 0) {
     res.status(404).send({ error: "Article not found" });
   } else {
+    const {data:_,error} = await supabase.from("satirical_news_article").update({views_last_24:data.views_last_24+1}).eq("id", id)
+    console.log(_, error)
     const userId = req.cookies?.id;
     console.log(req.cookies);
     if (userId) {
-      const { data: user_data, error } = await supabase
+      const { data: user_data } = await supabase
         .from("users")
         .select("tags")
         .eq("user", userId)
         .single();
-      console.log(user_data);
       if (user_data && user_data.tags) {
         const updatedTags = { ...user_data.tags };
         data.tags.forEach((tag: string) => {
@@ -88,7 +84,6 @@ app.get("/article/:id", async (req, res) => {
             updatedTags[tag] = 1;
           }
         });
-        console.log(updatedTags, "________");
         const { data: tag_success, error: updateError } = await supabase
           .from("users")
           .update({ tags: updatedTags })
@@ -161,7 +156,7 @@ app.get("/filter-articles", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const { email, password, name } = req.body;
+  const { email, password } = req.body;
   const { data: user_data, error: user_error } = await supabase.auth.signUp({
     email: email,
     password: password,
@@ -239,6 +234,19 @@ app.get("/recommended", async (req, res) => {
   });
   res.send(recommendations);
 });
+
+app.get("/trending", async (_, res)=>{
+  console.log("trending")
+  const articles = await get_articles() as news_article_trending[] | false
+  if (!articles){
+    res.status(500).send({error:"We couldn't fetch the articles"})
+    return
+  }
+  articles.sort((a, b)=>{
+    return b.views_last_24-a.views_last_24
+  })
+  res.send(articles)
+})
 
 ViteExpress.listen(app, 3000, () =>
   console.log("Server is listening on port 3000...")
