@@ -13,9 +13,11 @@ import supabase from "./supabase";
 import cookieParser from "cookie-parser";
 import { news_article_trending, NewsArticle, user_tag } from "./types";
 dotenv.config();
+const cors = require('cors');
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.post("/create-articles", async (req, res) => {
   const key = req.body.api_key;
@@ -176,13 +178,6 @@ app.post("/register", async (req, res) => {
       res.status(500).send({ error: "Error creating new User" });
       return;
     } else {
-      // const test = await resend.emails.send({
-      //   from:"test@test.com",
-      //   to:"sallairobert94@gmail.com",
-      //   subject:"hello world",
-      //   html:"Hello world"
-      // })
-      // console.log(test.data, test.error)
       res
         .cookie("id", user?.id, { expires: new Date(Date.now() + 86000000) })
         .send({ success: true, message: "User created successfully", user });
@@ -197,8 +192,8 @@ app.post("/login", async (req, res) => {
       email: email,
       password: password,
     });
-    console.log(data, error);
-    res.send("hello");
+    console.log(data, error)
+    res.send({session: data.session,user: data.user});
   }
 });
 
