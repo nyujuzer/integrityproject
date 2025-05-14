@@ -193,6 +193,7 @@ app.post("/login", async (req, res) => {
       password: password,
     });
     console.log(data, error)
+    res.cookie("user",data.session)
     res.send({session: data.session,user: data.user});
   }
 });
