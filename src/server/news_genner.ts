@@ -66,6 +66,7 @@ const upload = async (article: NewsArticle) => {
         }
 }
 const getnews = async (): Promise<VerboseResult> => {
+  console.log("Starting to fetch news from the API...");
   try {
     const response = await fetch(
       `https://newsdata.io/api/1/latest?apikey=${NEWS_KEY}&language=en`
@@ -73,7 +74,7 @@ const getnews = async (): Promise<VerboseResult> => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.log(NEWS_KEY)
+      console.error("Failed to fetch news from the API. Status:", response.status);
       return {
         success: false,
         message: "We are having trouble reaching the news API.",
@@ -81,9 +82,11 @@ const getnews = async (): Promise<VerboseResult> => {
       };
     }
 
+    console.log("Successfully fetched news data from the API.");
     const data = await response.json();
 
     if (!Array.isArray(data.results)) {
+      console.error("Unexpected data format received from the news API:", data);
       return {
         success: false,
         message: "Received unexpected data format from news API.",
@@ -91,15 +94,18 @@ const getnews = async (): Promise<VerboseResult> => {
       };
     }
 
+    console.log("Processing articles from the fetched news data...");
     const article_extract = data.results.map((article: any) => ({
       title: article.title,
       description: article.description,
     }));
 
     for (const article of article_extract) {
+      console.log("Generating satirical article for:", article.title);
       const newsArticle = await generate_article(article);
 
       if (newsArticle.error) {
+        console.error("Error generating satirical article:", newsArticle.error);
         return {
           success: false,
           message: "Error generating satirical article from news data.",
@@ -107,22 +113,26 @@ const getnews = async (): Promise<VerboseResult> => {
         };
       }
 
+      console.log("Uploading satirical article to Supabase...");
       const success = await upload(JSON.parse(JSON.stringify(newsArticle)));
       if (!success) {
+        console.error("Failed to upload satirical article to Supabase.");
         return {
           success: false,
           message: "Failed to upload satirical article to Supabase.",
         };
       }
+
+      console.log("Successfully uploaded satirical article:", newsArticle.title);
     }
 
-    console.log("supposedly it's good")
+    console.log("All articles processed and uploaded successfully.");
     return {
       success: true,
       message: "Successfully fetched, generated, and uploaded satirical news articles.",
     };
   } catch (error) {
-    console.log("error happened",error)
+    console.error("An unexpected error occurred while fetching the news:", error);
     return {
       success: false,
       message: "An unexpected error occurred while fetching the news.",
