@@ -38,10 +38,14 @@ app.post("/create-articles", async (req, res) => {
   }
 });
 app.get("/articles", async (req, res) => {
+  console.log("/articles")
   if (req.query.tag) {
+    console.log(req.query.tag);
+    
     res.redirect("/filter-articles?tag=" + req.query.tag);
     return;
   }
+  console.log("still standing")
   const satirical_news_article = await get_articles();
   if (!satirical_news_article) {
     console.error("Error fetching articles:");
@@ -51,8 +55,10 @@ app.get("/articles", async (req, res) => {
   }
 });
 app.get("/article/:id", async (req, res) => {
+  console.log("/article/",req.query, req.params)
   const id = req.params.id;
   if (!validate(id)) {
+    console.log(id, "invalid")
     res.status(400).send({ error: "Invalid UUID" });
     return;
   }
@@ -65,12 +71,11 @@ app.get("/article/:id", async (req, res) => {
     console.error("Error fetching articles:", error, "data:", data);
     res.status(500).send({ error: "Internal Server Error" });
   } else if (!data || data.length == 0) {
+    console.log(data. error, id, "specific article")
     res.status(404).send({ error: "Article not found" });
   } else {
     const {data:_,error} = await supabase.from("satirical_news_article").update({views_last_24:data.views_last_24+1}).eq("id", id)
-    console.log(_, error)
     const userId = req.cookies?.id;
-    console.log(req.cookies);
     if (userId) {
       const { data: user_data } = await supabase
         .from("users")
@@ -105,6 +110,8 @@ app.get("/article/:id", async (req, res) => {
         }
       }
     }
+    console.log("exit article", data);
+    
     res.send(data);
   }
 });
@@ -137,22 +144,30 @@ app.post("/create-article", async (req, res) => {
 
 app.get("/filter-articles", async (req, res) => {
   console.log("filter-articles");
-  const tag = req.query.tag?.toString().toUpperCase() as string;
+  const tag = req.query.tag as string
+  console.log(tag ," - tag")
   if (!tag) {
+    console.log("hello")
     res.redirect("/articles");
     return;
   }
-  const tags = tag.split("+").map((tag) => tag.trim().toUpperCase());
+  console.log("filtering");
+  
+  const tags = tag.split(" ").map((tag) => tag.trim().toUpperCase());
+  console.log(tags, "post split");
+  
   const { data, error } = await supabase
     .from("satirical_news_article")
     .select("*")
-    .contains("tags", [tags]);
+    .contains("tags", tags);
   if (error) {
     console.error("Error fetching articles:", error, "data:", data);
     res.status(500).send({ error: "Internal Server Error" });
   } else if (!data || data.length == 0) {
+    console.log("not found,", data)
     res.status(404).send({ error: "Article not found" });
   } else {
+    console.log(data, "___________")
     res.send(data);
   }
 });
@@ -244,6 +259,6 @@ app.get("/trending", async (_, res)=>{
   res.send(articles)
 })
 
-ViteExpress.listen(app, 3000, () =>
+ViteExpress.listen(app, 8000, () =>
   console.log("Server is listening on port 3000...")
 );

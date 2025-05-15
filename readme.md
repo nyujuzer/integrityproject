@@ -34,12 +34,30 @@ const get_specific_article = async (article_id)=>{
     return response.json()
 }
 ```
-- /create-articles?api_key=YOUR_API_KEY - runs the article creation process. Right now, there is only one API key available, as the project is still in development. I chose set this system up, to make sure only us can access the model. i wouldn't want a $3000 invoice from google. 
+- /create-articles - This is a post request, that needs an api key in the request body. This runs the article creation process. Right now, there is only one API key available, as the project is still in development. I chose set this system up, to make sure only us can access the model. i wouldn't want a $3000 invoice from google. 
 This will not be needed on the front-end
 
+### usage:
+```
+const options = {
+  method: 'POST',
+  body: '{"api_key":API_KEY}'
+};
+
+fetch(`${baseURL}/create-articles/`, options)
+const json = await  response.json()
+```
+
 - /filter-articles?tags=tag1+tag2 - This will return the articles on which the specified tags are present.This way the user's can select if they wanna read news that are about both economy, and the state of yu-gi-oh for example
+### usage:
+```
+const response = await fetch(`${baseURL}/filter-articles?tag=economy`)
+const json = await response.json()
+```
 
 - /register - This is a POST request, in which you pass in name, email, and password into the body.
+### usage:
+
 - /login - This endpoint is a POST request, however it's unavailable until further notice
 - /recommended - This GET request will return a list of articles, weighed by the tags the user has deliberately clicked on  
 This endpoint will return in the same format as /articles

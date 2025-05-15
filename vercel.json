@@ -10,6 +10,15 @@
     {
       "src": "/(.*)",
       "dest": "src/server/main.ts"
+    },
+    {
+      "src":"/cron",
+      "dest":"src/server/cron/index.ts"
     }
+  ],
+  "crons":[
+    {"path":"/cron",
+    "schedule":"5 * * * *"
+  }
   ]
 }
