@@ -116,11 +116,13 @@ const getnews = async (): Promise<VerboseResult> => {
       }
     }
 
+    console.log("supposedly it's good")
     return {
       success: true,
       message: "Successfully fetched, generated, and uploaded satirical news articles.",
     };
   } catch (error) {
+    console.log("error happened",error)
     return {
       success: false,
       message: "An unexpected error occurred while fetching the news.",
