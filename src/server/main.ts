@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 // })
 
 
-app.get("/create-articles", async (req, res) => {
+app.get("/create-articles", (req, res) => {
   // const key = req.body.api_key;
   // if (key) {
   //   const { data, error } =await validate_api_key(key)
@@ -37,9 +37,9 @@ app.get("/create-articles", async (req, res) => {
   //     console.error("Error fetching API key:", error);
   //     res.status(401).send({ error: "Unauthorized" });
   //   } else {
-      const value = await createNewsArticle();
+      const value = createNewsArticle();
       console.log("value", value);
-      res.send(value);
+      res.send("test");
     // }
   }
 // }
