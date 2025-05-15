@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 // })
 
 
-app.get("/create-articles", (req, res) => {
+app.get("/create-articles", async (req, res) => {
 
   const authHeader = req.headers.authorization;
   console.log(authHeader)
@@ -38,14 +38,9 @@ app.get("/create-articles", (req, res) => {
     console.log(authHeader == `Bearer ${process.env.CRON_SECRET}`, "\n\n", authHeader, `\n${process.env.CRON_SECRET}`)
     return res.status(401).json({ success: false });
   } else {
-    const value = createNewsArticle();
-    res.send("test");
-    value.then(e=>{
-      console.log(e)
-    }).catch(err=>{
-      console.error(err)
-    })
-  }
+    const value =await  createNewsArticle();
+    res.send( value );
+    }
 });
 app.get("/articles", async (req, res) => {
   console.log("/articles")
