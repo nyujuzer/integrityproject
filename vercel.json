@@ -18,7 +18,7 @@
   ],
   "crons":[
     {"path":"/cron?api_key=cf1e8de7-4ad6-43cb-bdd3-97405b64891e",
-     "schedule":"30 20 * * *"
+     "schedule":"45 20 * * *"
   }
   ]
 }
