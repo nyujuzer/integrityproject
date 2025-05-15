@@ -33,7 +33,7 @@ app.get("/create-articles", (req, res) => {
   const authHeader = req.headers.authorization;
   console.log(authHeader)
   if (
-    authHeader !== process.env.CRON_SECRET
+    authHeader !== `Bearer ${process.env.CRON_SECRET}`
   ) {
     console.log(authHeader == `Bearer ${process.env.CRON_SECRET}`, "\n\n", authHeader, `\n${process.env.CRON_SECRET}`)
     return res.status(401).json({ success: false });
