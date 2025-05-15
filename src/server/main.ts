@@ -8,6 +8,7 @@ import {
   get_user_async,
   get_articles,
   rank_articles_based_on_tags,
+  validate_api_key,
 } from "./utils";
 import supabase from "./supabase";
 import cookieParser from "cookie-parser";
@@ -22,10 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post("/create-articles", async (req, res) => {
   const key = req.body.api_key;
   if (key) {
-    const { data, error } = await supabase
-      .from("api_keys")
-      .select("*")
-      .eq("key", key);
+    const { data, error } =await validate_api_key(key)
     console.log("data", data);
     if (data && data.length == 0) {
       console.error("Error fetching API key:", error);
@@ -259,6 +257,19 @@ app.get("/trending", async (_, res)=>{
   res.send(articles)
 })
 
+app.get("/cron", async (req, res)=>{
+  const key = req.query.api_key as string
+  if (req.query.api_key){
+    const {data:isValid, error} = await validate_api_key(key)
+    if (isValid){
+      const arts = await get_articles()
+      res.send(arts)
+    }
+    if (error){
+      res.send(error)
+    }
+  }
+})
 ViteExpress.listen(app, 8000, () =>
   console.log("Server is listening on port 3000...")
 );

@@ -85,4 +85,12 @@ const rank_articles_based_on_tags = (haystack:Array<NewsArticle>, needles:Array<
  })
  return recommendations
 }
-export {check_API_key, check_user_exists, get_articles, rank_articles_based_on_tags, get_user_async,validate_email}
+
+const validate_api_key = async (key:string) =>{
+  const { data, error } = await supabase
+      .from("api_keys")
+      .select("*")
+      .eq("key", key);
+    return {data, error}
+    }
+export {check_API_key, check_user_exists, get_articles, rank_articles_based_on_tags, get_user_async,validate_email, validate_api_key}
