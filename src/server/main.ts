@@ -29,21 +29,20 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.get("/create-articles", (req, res) => {
-  // const key = req.body.api_key;
-  // if (key) {
-  //   const { data, error } =await validate_api_key(key)
-  //   console.log("data", data);
-  //   if (data && data.length == 0) {
-  //     console.error("Error fetching API key:", error);
-  //     res.status(401).send({ error: "Unauthorized" });
-  //   } else {
-      const value = createNewsArticle();
-      console.log("value", value);
-      res.send("test");
-    // }
+
+  const authHeader = req.headers.authorization;
+  console.log(authHeader)
+  if (
+    authHeader !== process.env.CRON_SECRET
+  ) {
+    console.log(authHeader == `Bearer ${process.env.CRON_SECRET}`, "\n\n", authHeader, `\n${process.env.CRON_SECRET}`)
+    return res.status(401).json({ success: false });
+  } else {
+    const value = createNewsArticle();
+    console.log("value", value);
+    return res.send("test");
   }
-// }
-);
+});
 app.get("/articles", async (req, res) => {
   console.log("/articles")
   if (req.query.tag) {
