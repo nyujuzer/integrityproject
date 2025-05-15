@@ -130,6 +130,8 @@ const getnews = async (): Promise<VerboseResult> => {
 };
 
 const createNewsArticle = async (): Promise<VerboseResult> => {
+  console.log("we in here");
+  
   return await getnews();
 };
 

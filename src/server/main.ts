@@ -20,21 +20,30 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-app.post("/create-articles", async (req, res) => {
-  const key = req.body.api_key;
-  if (key) {
-    const { data, error } =await validate_api_key(key)
-    console.log("data", data);
-    if (data && data.length == 0) {
-      console.error("Error fetching API key:", error);
-      res.status(401).send({ error: "Unauthorized" });
-    } else {
+
+
+// app.get("/cron", (req, res)=>{
+//   console.log("hello world")
+//   res.send("painful suffering")
+// })
+
+
+app.get("/create-articles", async (req, res) => {
+  // const key = req.body.api_key;
+  // if (key) {
+  //   const { data, error } =await validate_api_key(key)
+  //   console.log("data", data);
+  //   if (data && data.length == 0) {
+  //     console.error("Error fetching API key:", error);
+  //     res.status(401).send({ error: "Unauthorized" });
+  //   } else {
       const value = await createNewsArticle();
       console.log("value", value);
       res.send(value);
-    }
+    // }
   }
-});
+// }
+);
 app.get("/articles", async (req, res) => {
   console.log("/articles")
   if (req.query.tag) {
@@ -257,19 +266,7 @@ app.get("/trending", async (_, res)=>{
   res.send(articles)
 })
 
-app.get("/cron", async (req, res)=>{
-  const key = req.query.api_key as string
-  if (req.query.api_key){
-    const {data:isValid, error} = await validate_api_key(key)
-    if (isValid){
-      const arts = await get_articles()
-      res.send(arts)
-    }
-    if (error){
-      res.send(error)
-    }
-  }
-})
-ViteExpress.listen(app, 8000, () =>
+
+ViteExpress.listen(app, 3000, () =>
   console.log("Server is listening on port 3000...")
 );
