@@ -39,8 +39,12 @@ app.get("/create-articles", (req, res) => {
     return res.status(401).json({ success: false });
   } else {
     const value = createNewsArticle();
-    console.log("value", value);
-    return res.send("test");
+    res.send("test");
+    value.then(e=>{
+      console.log(e)
+    }).catch(err=>{
+      console.error(err)
+    })
   }
 });
 app.get("/articles", async (req, res) => {
