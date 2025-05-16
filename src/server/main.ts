@@ -19,6 +19,11 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
+app.use((req, res, next)=>{
+  req.setTimeout(10*60*1000)
+  res.setTimeout(10*60*1000)
+  next()
+})
 app.use(express.urlencoded({ extended: true }));
 
 
@@ -29,7 +34,6 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.get("/create-articles", async (req, res) => {
-
   const authHeader = req.headers.authorization;
   console.log(authHeader)
   if (
@@ -39,7 +43,7 @@ app.get("/create-articles", async (req, res) => {
     return res.status(401).json({ success: false });
   } else {
     const {data, error} = await supabase.from("satirical_news_articles").update({"views_last_24": 0}).select()
-    const value = createNewsArticle();
+    const value = await createNewsArticle();
     console.log(data, error, "Hello world")
     res.send( {articles: value, error_if_any: error, data:data});
     }
