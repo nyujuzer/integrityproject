@@ -39,7 +39,9 @@ app.get("/create-articles", async (req, res) => {
     return res.status(401).json({ success: false });
   } else {
     const value =await  createNewsArticle();
-    res.send( value );
+    const {data, error} = await supabase.from("satirical_news_articles").update({"views_last_24": 0}).select()
+    console.log(data, error)
+    res.send( {articles: value, error_if_any: error, data:data});
     }
 });
 app.get("/articles", async (req, res) => {
