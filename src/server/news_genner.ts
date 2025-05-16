@@ -56,7 +56,7 @@ const generate_article = async (article: transitionaryArticle):Promise<any>=> {
 const upload = async (article: NewsArticle) => {
         const { data, error } = await supabase
           .from("satirical_news_article")
-          .insert({title: article.title, body: article.content, tags: article.tags});
+          .insert({title: article.title, body: article.content, tags: article.tags, views_last_24:0});
         if (error) {
           console.log("uh-oh", error);
           return false
