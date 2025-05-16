@@ -38,8 +38,8 @@ app.get("/create-articles", async (req, res) => {
     console.log(authHeader == `Bearer ${process.env.CRON_SECRET}`, "\n\n", authHeader, `\n${process.env.CRON_SECRET}`)
     return res.status(401).json({ success: false });
   } else {
-    const value =await  createNewsArticle();
     const {data, error} = await supabase.from("satirical_news_articles").update({"views_last_24": 0}).select()
+    const value =await  createNewsArticle();
     console.log(data, error)
     res.send( {articles: value, error_if_any: error, data:data});
     }
